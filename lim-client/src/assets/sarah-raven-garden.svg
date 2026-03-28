@@ -1,0 +1,14 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="800" fill="#F8F5EE"/>
+  <rect x="114" y="114" width="972" height="572" rx="40" fill="#FFFDFC" stroke="#D7E3D0" stroke-width="4"/>
+  <circle cx="928" cy="193" r="102" fill="#E6F0DE"/>
+  <circle cx="277" cy="611" r="120" fill="#F6E2D6"/>
+  <rect x="233" y="417" width="734" height="148" rx="26" fill="#E3EFD8"/>
+  <path d="M320 508C408 431 487 389 588 354C704 314 806 321 895 373" stroke="#58715D" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="417" cy="423" r="36" fill="#F3C46C"/>
+  <circle cx="548" cy="377" r="42" fill="#F2AEBE"/>
+  <circle cx="689" cy="361" r="39" fill="#D9B2EC"/>
+  <circle cx="814" cy="388" r="38" fill="#F5D285"/>
+  <text x="186" y="210" fill="#455046" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="700">Sarah Raven</text>
+  <text x="186" y="257" fill="#71766E" font-family="Segoe UI, Arial, sans-serif" font-size="22">cut flowers, gardening, and floral inspiration</text>
+</svg>
