@@ -1,32 +1,34 @@
 import Button from '../components/Button'
-import { articles } from '../data/articles'
+import articles from '../assets/article-content'
 
 const contentBlocks = [
   {
-    title: 'Introduction Block',
-    text: 'The about page opens with a grouped hero section that mirrors the screenshot wireframe while replacing placeholders with a real visual and a fuller introduction.',
+    title: 'Concept',
+    text: 'Archive cafes by atmosphere: mood, interior, lighting, music, and crowd energy, so visitors can choose a place by feeling instead of only by menu.',
   },
   {
-    title: 'Experience Block',
-    text: 'The page explains how the redesign keeps a clean classroom-style wireframe but improves it with actual floral imagery, topic-specific writing, and clearer page purpose.',
+    title: 'Structure',
+    text: 'Homepage to archive to cafe detail pages. Data lives in one file and flows through reusable list and detail components.',
   },
   {
-    title: 'Details Block',
-    text: 'Supporting sections break the content into quick facts, design notes, and image references so the page stays readable and easy to expand later.',
+    title: 'Use Cases',
+    text: 'Find a quiet corner to write, a cinematic date spot, or a low-pressure work cafe without skimming latte scores.',
   },
 ]
 
 const AboutPage = () => {
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 sm:px-6">
-      <section className="border-y-2 border-stone-900 bg-[#f8f2e8] px-4 py-6 sm:px-6 sm:py-8">
+    <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 sm:px-6">
+      <div aria-hidden="true" className="page-glow" />
+
+      <section className="ui-shadow-panel relative rounded-[2.4rem] border border-[var(--border)] bg-[var(--surface)] px-5 py-8 sm:px-7 sm:py-10">
         <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
-          <div className="flex min-h-72 items-center justify-center rounded-3xl border-2 border-dashed border-stone-400 bg-stone-100 p-6">
-            <div className="grid w-full max-w-xl gap-4 sm:grid-cols-2">
+          <div className="ui-shadow-card rounded-3xl border border-[var(--border)] bg-[var(--soft)] p-6">
+            <div className="grid w-full gap-4 sm:grid-cols-2">
               {articles.slice(0, 4).map((article) => (
                 <div
-                  className="overflow-hidden rounded-[1.5rem] border-2 border-stone-900 bg-[#e8dfd0]"
-                  key={article.title}
+                  className="ui-shadow-card overflow-hidden rounded-[1.5rem] border border-[var(--border)] bg-white"
+                  key={article.name}
                 >
                   <img
                     alt={`${article.title} about preview`}
@@ -39,55 +41,54 @@ const AboutPage = () => {
           </div>
 
           <div>
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-stone-500">
-              About Section
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]">
+              About the Archive
             </p>
-            <h1 className="max-w-xl text-3xl font-bold leading-tight text-stone-900 sm:text-4xl">
-              A profile-style page that keeps the original wireframe and adds meaningful floral content.
+            <h1 className="font-editorial max-w-2xl text-5xl font-semibold leading-[0.92] text-[var(--text)] sm:text-6xl lg:text-[4.6rem]">
+              Why an atmosphere-first cafe index
             </h1>
-            <p className="mt-4 max-w-lg text-sm leading-7 text-stone-600">
-              This page now follows the same low-fidelity structure shown in the screenshots:
-              grouped layout, simple supporting blocks, and easy-to-read spacing. The difference is
-              that every section now has real content, real photos, and a clearer explanation of the
-              site&apos;s flower-publication theme.
+            <p className="mt-4 max-w-lg text-sm leading-7 text-[var(--muted)]">
+              Instead of scoring lattes, we document the feeling of a place: light temperature, soundtrack, crowd, and
+              the kinds of conversations that fit. Components stay reusable and routes stay clean so new cafes or moods
+              can drop in quickly.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button to="/" variant="primary">
                 Back Home
               </Button>
-              <Button to="/articles">Open Articles</Button>
+              <Button to="/articles">Open Archive</Button>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="border-y-2 border-stone-900 bg-[#f8f2e8] px-4 py-6 sm:px-6 sm:py-8">
+      <section className="ui-shadow-panel-soft rounded-[2rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-6 sm:px-6 sm:py-8">
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-stone-500">
-              Section Flow
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold text-stone-900">Stacked wireframe blocks</h2>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]">What we capture</p>
+            <h2 className="font-editorial mt-2 text-[2.4rem] font-semibold leading-[0.96] text-[var(--text)] sm:text-[2.9rem]">
+              Stacked, readable blocks
+            </h2>
 
             <div className="mt-6 space-y-4">
               {contentBlocks.map((block) => (
-                <article className="rounded-3xl border-2 border-stone-900 bg-stone-100 p-5" key={block.title}>
-                  <h3 className="text-lg font-semibold text-stone-900">{block.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-stone-600">{block.text}</p>
+                <article className="ui-shadow-card rounded-3xl border border-[var(--border)] bg-[var(--soft)] p-5" key={block.title}>
+                  <h3 className="font-editorial text-[1.7rem] font-semibold leading-[1.02] text-[var(--text)]">
+                    {block.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{block.text}</p>
                 </article>
               ))}
             </div>
           </div>
 
-          <div className="rounded-3xl border-2 border-stone-900 bg-stone-100 p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-stone-500">
-              Visual Grid
-            </p>
+          <div className="ui-shadow-card rounded-3xl border border-[var(--border)] bg-white p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]">Gallery</p>
             <div className="mt-5 grid grid-cols-2 gap-4">
               {articles.map((article) => (
                 <div
-                  className="overflow-hidden rounded-[1.25rem] border-2 border-stone-300 bg-[#e8dfd0]"
-                  key={article.title}
+                  className="ui-shadow-card overflow-hidden rounded-[1.25rem] border border-[var(--border)] bg-[var(--soft)]"
+                  key={article.name}
                 >
                   <img
                     alt={`${article.title} gallery tile`}

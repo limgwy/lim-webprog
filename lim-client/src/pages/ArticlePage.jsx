@@ -1,113 +1,46 @@
+import { useParams } from 'react-router-dom'
 import Button from '../components/Button'
-import { articles } from '../data/articles'
-
-const readingNotes = [
-  'Each article card keeps the screenshot wireframe structure: image area, title, summary, and action button.',
-  'The uploaded images now replace placeholder blocks so the page looks finished while still following the original layout.',
-  'Expanded writeups explain why each publication is useful for a flower-focused design theme and content direction.',
-]
+import articles from '../assets/article-content'
+import NotFoundPage from './NotFoundPage'
 
 const ArticlePage = () => {
-  const [featuredArticle, ...otherArticles] = articles
+  const { name } = useParams()
+  const article = articles.find((item) => item.name === name)
+
+  if (!article) {
+    return <NotFoundPage />
+  }
+
+  const { title, author, date, category, summary, image, content } = article
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 sm:px-6">
-      <section className="border-y-2 border-stone-900 bg-[#f8f2e8] px-4 py-6 sm:px-6 sm:py-8">
-        <div className="grid gap-6 lg:grid-cols-2 lg:items-center">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-stone-500">
-              Articles
-            </p>
-            <h1 className="mt-2 max-w-xl text-3xl font-bold leading-tight text-stone-900 sm:text-4xl">
-              A simple article section upgraded with real photography, links, and fuller descriptions.
-            </h1>
-            <p className="mt-4 max-w-lg text-sm leading-7 text-stone-600">
-              The page follows the screenshot wireframe by opening with a clear introduction and a
-              single supporting visual. Under that, the article cards repeat in a clean grid so the
-              content is easy to browse and the structure stays consistent.
-            </p>
-            <Button className="mt-6" to={featuredArticle.url} variant="primary">
-              Open Featured Source
-            </Button>
-          </div>
+    <div className="relative mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 sm:px-6">
+      <div aria-hidden="true" className="page-glow" />
 
-          <div className="overflow-hidden rounded-3xl border-2 border-stone-900 bg-stone-100">
-            <img
-              alt={`${featuredArticle.title} featured visual`}
-              className="aspect-[4/3] w-full object-cover object-center"
-              src={featuredArticle.image}
-            />
-          </div>
+      <section className="ui-shadow-panel relative rounded-[2.4rem] border border-[var(--border)] bg-[var(--surface)] px-5 py-8 sm:px-7 sm:py-10">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]">{category}</p>
+        <h1 className="font-editorial mt-3 max-w-4xl text-5xl font-semibold leading-[0.92] text-[var(--text)] sm:text-6xl lg:text-[4.6rem]">
+          {title}
+        </h1>
+        <p className="mt-2 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">{author} / {date}</p>
+        <p className="mt-4 max-w-3xl text-sm leading-7 text-[var(--muted)]">{summary}</p>
+        <div className="ui-shadow-card mt-6 overflow-hidden rounded-3xl border border-[var(--border)] bg-white">
+          <img alt={`${title} visual`} className="aspect-[4/3] w-full object-cover" src={image} />
         </div>
       </section>
 
-      <section className="border-y-2 border-stone-900 bg-[#f5eee2] px-4 py-6 sm:px-6 sm:py-8">
-        <div className="mb-6">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-stone-500">
-            Featured Articles
-          </p>
-          <h2 className="mt-2 text-2xl font-semibold text-stone-900">Wireframe-based article cards</h2>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {[featuredArticle, ...otherArticles].map((article) => (
-            <article className="rounded-3xl border-2 border-stone-900 bg-stone-100 p-4" key={article.title}>
-              <div className="overflow-hidden rounded-[1.5rem] border-2 border-stone-300 bg-[#e8dfd0]">
-                <img
-                  alt={`${article.title} article image`}
-                  className="aspect-[4/3] w-full object-cover object-center"
-                  src={article.image}
-                />
-              </div>
-              <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-500">
-                {article.source}
-              </p>
-              <h3 className="mt-2 text-lg font-semibold text-stone-900">{article.title}</h3>
-              <p className="mt-3 text-sm leading-6 text-stone-600">{article.summary}</p>
-              <Button className="mt-4" to={article.url} variant="primary">
-                Read More
-              </Button>
-            </article>
+      <section className="ui-shadow-panel-soft rounded-[2rem] border border-[var(--border)] bg-[var(--surface)] px-5 py-7 sm:px-7">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[var(--muted)]">Atmosphere Notes</p>
+        <div className="mt-4 space-y-4 text-[15px] leading-7 text-[var(--muted)]">
+          {content.map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
           ))}
         </div>
-      </section>
-
-      <section className="border-y-2 border-stone-900 bg-[#f8f2e8] px-4 py-6 sm:px-6 sm:py-8">
-        <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-stone-500">
-              Reading Notes
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold text-stone-900">How the enhancement was applied</h2>
-
-            <div className="mt-6 space-y-4">
-              {readingNotes.map((note) => (
-                <article className="rounded-3xl border-2 border-stone-900 bg-stone-100 p-5" key={note}>
-                  <p className="text-sm leading-6 text-stone-600">{note}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-3xl border-2 border-stone-900 bg-stone-100 p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-stone-500">
-              Image Panel
-            </p>
-            <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              {articles.map((article) => (
-                <div
-                  className="overflow-hidden rounded-[1.25rem] border-2 border-stone-300 bg-[#e8dfd0]"
-                  key={article.title}
-                >
-                  <img
-                    alt={`${article.title} panel`}
-                    className="aspect-[4/3] w-full object-cover object-center"
-                    src={article.image}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Button to="/articles" variant="primary">
+            Back to List
+          </Button>
+          <Button to="/">Home</Button>
         </div>
       </section>
     </div>

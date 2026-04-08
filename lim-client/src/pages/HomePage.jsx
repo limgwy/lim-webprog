@@ -1,69 +1,93 @@
 import Button from '../components/Button'
-import { articles } from '../data/articles'
+import articles from '../assets/article-content'
+
+const stats = [
+  { label: 'Cafes', value: '11' },
+  { label: 'Moods', value: '6' },
+  { label: 'Neighborhoods', value: '8' },
+  { label: 'Playlists', value: '11' },
+]
 
 const HomePage = () => {
-  const [heroArticle, ...featureCards] = articles
+  const [, ...featureCards] = articles
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 sm:px-6">
-      <section className="border-y-2 border-stone-900 bg-[#f8f2e8] px-4 py-6 sm:px-6 sm:py-8">
-        <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-stone-500">
-              Home Section
-            </p>
-            <h1 className="mt-2 max-w-xl text-3xl font-bold leading-tight text-stone-900 sm:text-4xl">
-              A flower-themed wireframe brought to life with real images and fuller content.
-            </h1>
-            <p className="mt-4 max-w-lg text-sm leading-7 text-stone-600">
-              This homepage now follows the original screenshot structure: a simple hero, a
-              supporting image panel, and grouped content cards. The enhancements add a designed
-              navigation bar, richer writeups, and floral imagery without losing the clean layout.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Button to="/about" variant="primary">
-                Learn More
-              </Button>
-              <Button to="/articles">View Articles</Button>
-            </div>
-          </div>
+    <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 sm:px-6">
+      <div aria-hidden="true" className="page-glow" />
 
-          <div className="rounded-3xl border-2 border-dashed border-stone-400 bg-stone-100 p-6">
-            <div className="overflow-hidden rounded-[2rem] border-2 border-stone-900 bg-[#e8dfd0]">
-              <img
-                alt={`${heroArticle.title} garden preview`}
-                className="aspect-[4/3] w-full object-cover object-center"
-                src={heroArticle.image}
-              />
+      <section className="ui-shadow-panel relative rounded-[2.4rem] border border-[var(--border)] bg-[var(--surface)] px-5 py-8 sm:px-7 sm:py-10">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]">
+          Cafe atmosphere archive
+        </p>
+        <h1 className="font-editorial mt-2 max-w-4xl text-5xl font-semibold leading-[0.9] text-[var(--text)] sm:text-6xl lg:text-[5rem]">
+          A curated archive of cafes, atmosphere, and city mood.
+        </h1>
+        <p className="mt-4 max-w-3xl text-sm leading-7 text-[var(--muted)]">
+          Spaces for thinking, working, meeting, and disappearing. Browse by mood, interior, lighting, music, and the
+          kind of person who lingers there.
+        </p>
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Button to="/articles" variant="primary">
+            Explore Cafes
+          </Button>
+          <Button to="/articles">Browse by Mood</Button>
+        </div>
+
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {stats.map((item) => (
+            <div
+              className="ui-shadow-card rounded-2xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-center text-sm font-semibold tracking-[0.04em] text-[var(--muted)]"
+              key={item.label}
+            >
+              <div className="text-2xl font-black text-[var(--text)]">{item.value}</div>
+              <div className="text-[11px]">{item.label}</div>
             </div>
-          </div>
+          ))}
         </div>
       </section>
 
-      <section className="border-y-2 border-stone-900 bg-[#f8f2e8] px-4 py-6 sm:px-6 sm:py-8">
-        <div className="mb-6">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-stone-500">
-            Feature Cards
-          </p>
-          <h2 className="mt-2 text-2xl font-semibold text-stone-900">
-            Article previews using your uploaded pictures
-          </h2>
+      <section className="ui-shadow-glass relative overflow-hidden rounded-[2rem] border border-white/45 bg-white/42 px-4 py-6 backdrop-blur-xl sm:px-6 sm:py-8">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.32),rgba(255,255,255,0.12)_38%,rgba(255,255,255,0.04)_100%)]"
+        />
+        <div className="relative mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]">
+              Featured Sections
+            </p>
+            <h2 className="font-editorial mt-1 text-[2.5rem] font-semibold leading-[0.95] text-[var(--text)] sm:text-[3rem]">
+              Pick a mood to enter
+            </h2>
+          </div>
+          <span className="text-sm font-medium tracking-[0.04em] text-[var(--muted)] transition duration-300 ease-out hover:text-[var(--text)]">
+            Props-powered
+          </span>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
-          {featureCards.map((article) => (
-            <article className="rounded-3xl border-2 border-stone-900 bg-stone-100 p-4" key={article.title}>
-              <div className="overflow-hidden rounded-[1.5rem] border-2 border-stone-300 bg-[#e8dfd0]">
+        <div className="relative grid gap-4 md:grid-cols-3">
+          {featureCards.slice(0, 3).map((article) => (
+            <article
+              className="ui-shadow-card ui-shadow-card-lift flex h-full flex-col rounded-3xl border border-[var(--border)] bg-white p-4 transition hover:-translate-y-1"
+              key={article.name}
+            >
+              <div className="overflow-hidden rounded-[1.5rem] border border-[var(--border)] bg-[var(--soft)]">
                 <img
                   alt={`${article.title} preview`}
-                  className="aspect-[4/3] w-full object-cover object-center"
+                  className="aspect-[4/3] w-full object-cover object-center transition duration-300 hover:scale-[1.02]"
                   src={article.image}
                 />
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-stone-900">{article.title}</h3>
-              <p className="mt-3 text-sm leading-6 text-stone-600">{article.summary}</p>
-              <Button className="mt-4" to={article.url} variant="primary">
-                View More
+              <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--muted)]">
+                {article.category}
+              </p>
+              <h3 className="font-editorial mt-2 text-[1.8rem] font-semibold leading-[1.02] text-[var(--text)]">
+                {article.title}
+              </h3>
+              <p className="mt-3 line-clamp-2 text-sm leading-6 text-[var(--muted)]">{article.summary}</p>
+              <Button className="mt-auto self-start pt-4" to={`/articles/${article.name}`} variant="primary">
+                View Cafe
               </Button>
             </article>
           ))}

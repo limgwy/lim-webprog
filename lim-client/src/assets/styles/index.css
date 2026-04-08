@@ -1,15 +1,34 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Geist:wght@100..900&display=swap");
 @import "tailwindcss";
 
 :root {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --bg: #fafaf8;
+  --surface: #ffffff;
+  --soft: #f5f5f3;
+  --text: #111111;
+  --muted: #6b7280;
+  --border: #e7e5e4;
+  --accent-from: #fde7d9;
+  --accent-via: #f8d7da;
+  --accent-to: #f5c2e7;
+  --shadow-panel: 0 28px 70px rgba(17, 17, 17, 0.08), 0 8px 24px rgba(17, 17, 17, 0.04);
+  --shadow-panel-soft: 0 20px 48px rgba(17, 17, 17, 0.07), 0 6px 18px rgba(17, 17, 17, 0.03);
+  --shadow-card: 0 16px 36px rgba(17, 17, 17, 0.06), 0 4px 14px rgba(17, 17, 17, 0.03);
+  --shadow-card-hover: 0 26px 54px rgba(17, 17, 17, 0.1), 0 10px 22px rgba(17, 17, 17, 0.04);
+  --shadow-glass: 0 30px 72px rgba(17, 17, 17, 0.08), 0 10px 26px rgba(17, 17, 17, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.58);
+  --shadow-button-dark: 0 14px 30px rgba(17, 17, 17, 0.18), 0 4px 10px rgba(17, 17, 17, 0.08);
+  --shadow-button-dark-hover: 0 20px 38px rgba(17, 17, 17, 0.24), 0 8px 16px rgba(17, 17, 17, 0.1);
+  --shadow-button-light: 0 12px 26px rgba(17, 17, 17, 0.08), 0 3px 10px rgba(17, 17, 17, 0.04);
+  --shadow-button-light-hover: 0 18px 32px rgba(17, 17, 17, 0.12), 0 6px 14px rgba(17, 17, 17, 0.06);
+  font-family: 'Geist', sans-serif;
   line-height: 1.5;
   font-weight: 400;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #2f2a25;
-  background: #faf7f2;
+  color: var(--text);
+  background: var(--bg);
 }
 
 * {
@@ -24,7 +43,12 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: #faf7f2;
+  background: linear-gradient(180deg, #fed9c9 0%, #fbcbd1 44%, #f2b5df 100%);
+  font-family: 'Geist', sans-serif;
+}
+
+.page-glow {
+  display: none;
 }
 
 img {
@@ -40,4 +64,45 @@ input,
 textarea,
 select {
   font: inherit;
+}
+
+.ui-shadow-panel {
+  box-shadow: var(--shadow-panel);
+}
+
+.ui-shadow-panel-soft {
+  box-shadow: var(--shadow-panel-soft);
+}
+
+.ui-shadow-card {
+  box-shadow: var(--shadow-card);
+}
+
+.ui-shadow-card-lift:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.ui-shadow-glass {
+  box-shadow: var(--shadow-glass);
+}
+
+.ui-shadow-button-dark {
+  box-shadow: var(--shadow-button-dark);
+}
+
+.ui-shadow-button-dark:hover {
+  box-shadow: var(--shadow-button-dark-hover);
+}
+
+.ui-shadow-button-light {
+  box-shadow: var(--shadow-button-light);
+}
+
+.ui-shadow-button-light:hover {
+  box-shadow: var(--shadow-button-light-hover);
+}
+
+.font-editorial {
+  font-family: "Cormorant Garamond", serif;
+  letter-spacing: -0.03em;
 }
