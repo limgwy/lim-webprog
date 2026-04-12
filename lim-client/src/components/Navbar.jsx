@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import Logo from './Logo'
+import Button from './Button'
 
 const navItems = [
   { to: '/', label: 'Home' },
@@ -12,6 +13,9 @@ const linkClasses = ({ isActive }) =>
     'group relative px-1 py-2 text-sm font-semibold tracking-[0.01em] transition duration-300 ease-out',
     isActive ? 'text-[var(--text)]' : 'text-[var(--muted)] hover:text-[var(--text)]',
   ].join(' ')
+
+const authLinkClasses =
+  'hidden text-sm font-semibold text-[var(--muted)] transition duration-300 ease-out hover:text-[var(--text)] sm:inline-flex'
 
 const Navbar = () => {
   return (
@@ -40,6 +44,15 @@ const Navbar = () => {
               )}
             </NavLink>
           ))}
+        </div>
+
+        <div className="flex items-center gap-2 sm:gap-3">
+          <NavLink className={authLinkClasses} to="/auth/signin">
+            Log In
+          </NavLink>
+          <Button className="px-3 py-1.5 text-[11px] tracking-[0.08em] sm:px-4" to="/auth/signup" variant="primary">
+            Sign Up
+          </Button>
         </div>
       </nav>
     </header>

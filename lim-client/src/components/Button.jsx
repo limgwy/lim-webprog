@@ -9,7 +9,7 @@ const variantClasses = {
 
 const Button = ({ children, to, type = 'button', variant = 'secondary', className = '' }) => {
   const classes = [
-    'inline-flex min-h-11 items-center justify-center rounded-2xl border px-5 py-2.5 text-sm font-semibold tracking-[0.01em] transition duration-300 ease-out',
+    'inline-flex min-h-10 items-center justify-center rounded-2xl border px-4 py-2 text-sm font-semibold tracking-[0.01em] transition duration-300 ease-out',
     variantClasses[variant] ?? variantClasses.secondary,
     className,
   ]
