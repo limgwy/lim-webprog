@@ -41,7 +41,7 @@ const SignUpPage = () => {
             <label className="text-sm font-medium text-zinc-700" htmlFor="last-name">
               Last Name
             </label>
-            <input
+            <input   
               autoComplete="family-name"
               className={inputClasses}
               id="last-name"
