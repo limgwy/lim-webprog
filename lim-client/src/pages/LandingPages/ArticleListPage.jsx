@@ -1,8 +1,10 @@
 import ArticleList from '../../components/ArticleList'
 import Button from '../../components/Button'
-import articles from '../../assets/article-content'
+import { getPublishedArticles } from '../../services/articleStore'
 
 const ArticleListPage = () => {
+  const articles = getPublishedArticles()
+
   return (
     <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 sm:px-6">
       <div aria-hidden="true" className="page-glow" />
@@ -27,7 +29,13 @@ const ArticleListPage = () => {
           className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.32),rgba(255,255,255,0.12)_38%,rgba(255,255,255,0.04)_100%)]"
         />
         <div className="relative">
-          <ArticleList articles={articles} />
+          {articles.length ? (
+            <ArticleList articles={articles} />
+          ) : (
+            <p className="rounded-2xl border border-[var(--border)] bg-white px-5 py-4 text-sm font-medium text-[var(--muted)]">
+              No published articles are available right now.
+            </p>
+          )}
         </div>
       </section>
     </div>

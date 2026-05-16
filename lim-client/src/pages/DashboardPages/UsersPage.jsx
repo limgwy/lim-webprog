@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import {
   Alert,
@@ -27,7 +28,7 @@ import { DataGrid } from '@mui/x-data-grid'
 import InputLabel from '@mui/material/InputLabel'
 import FormControl from '@mui/material/FormControl'
 import Select from '@mui/material/Select'
-import usersSeed from '../../data/users.json?raw'
+import { genders, getCurrentUser, getUsers, roles, saveUsers } from '../../services/userStore'
 
 const COLORS = {
   primary: '#c58c7b',
@@ -40,9 +41,6 @@ const COLORS = {
   muted: 'var(--muted)',
   border: 'var(--border)',
 }
-
-const roles = ['admin', 'editor', 'viewer']
-const genders = ['male', 'female', 'other']
 
 const blankForm = {
   firstName: '',
@@ -59,39 +57,6 @@ const blankForm = {
 }
 
 const labelize = (value) => (value ? `${value.charAt(0).toUpperCase()}${value.slice(1)}` : '')
-
-const loadUsers = () => {
-  try {
-    return {
-      users: JSON.parse(usersSeed).map((user, index) => ({
-        id: Number(user.id) || index + 1,
-        firstName: String(user.firstName ?? '').trim(),
-        lastName: String(user.lastName ?? '').trim(),
-        age: String(user.age ?? '').trim(),
-        gender: genders.includes(String(user.gender ?? '').trim().toLowerCase())
-          ? String(user.gender ?? '').trim().toLowerCase()
-          : '',
-        contactNumber: String(user.contactNumber ?? '').trim(),
-        email: String(user.email ?? '').trim().toLowerCase(),
-        role: roles.includes(String(user.role ?? '').trim().toLowerCase())
-          ? String(user.role ?? '').trim().toLowerCase()
-          : 'editor',
-        username: String(user.username ?? '').trim().toLowerCase(),
-        password: String(user.password ?? ''),
-        address: String(user.address ?? '').trim(),
-        isActive: typeof user.isActive === 'boolean' ? user.isActive : true,
-      })),
-      error: '',
-    }
-  } catch {
-    return {
-      users: [],
-      error: 'Unable to read users from data/users.json.',
-    }
-  }
-}
-
-const seed = loadUsers()
 
 const filterDesign = {
   height: '44px',
@@ -171,7 +136,8 @@ const roleChipSx = {
 const UsersPage = () => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  const [users, setUsers] = useState(seed.users)
+  const currentUser = getCurrentUser()
+  const [users, setUsers] = useState(() => getUsers())
   const [searchQuery, setSearchQuery] = useState('')
   const [filters, setFilters] = useState({
     role: 'all',
@@ -182,6 +148,13 @@ const UsersPage = () => {
   const [form, setForm] = useState(blankForm)
   const [errors, setErrors] = useState({})
   const [showPassword, setShowPassword] = useState(false)
+
+  const commitUsers = (updater) => {
+    setUsers((prev) => {
+      const nextUsers = typeof updater === 'function' ? updater(prev) : updater
+      return saveUsers(nextUsers)
+    })
+  }
 
   const resetForm = () => {
     setForm({ ...blankForm })
@@ -290,7 +263,7 @@ const UsersPage = () => {
       isActive: form.isActive,
     }
 
-    setUsers((prev) =>
+    commitUsers((prev) =>
       modal.id
         ? prev.map((user) => (user.id === modal.id ? { ...user, ...nextUser } : user))
         : [
@@ -306,7 +279,7 @@ const UsersPage = () => {
   }
 
   const toggleStatus = (id) => {
-    setUsers((prev) => prev.map((user) => (user.id === id ? { ...user, isActive: !user.isActive } : user)))
+    commitUsers((prev) => prev.map((user) => (user.id === id ? { ...user, isActive: !user.isActive } : user)))
   }
 
   const fieldProps = (name, label, extra = {}) => ({
@@ -465,6 +438,60 @@ const UsersPage = () => {
     })
   }
 
+  if (currentUser?.role === 'editor') {
+    return (
+      <Box
+        sx={{
+          minHeight: 'calc(100vh - 140px)',
+          display: 'grid',
+          placeItems: 'center',
+          px: { xs: 1, md: 3 },
+        }}
+      >
+        <Paper
+          sx={{
+            width: '100%',
+            maxWidth: 720,
+            p: { xs: 3, sm: 4.5 },
+            borderRadius: '2rem',
+            border: '1px solid var(--border)',
+            boxShadow: 'var(--shadow-panel-soft)',
+            background:
+              'linear-gradient(135deg, rgba(255,255,255,0.96), rgba(255,255,255,0.9) 52%, rgba(253,231,217,0.62) 100%)',
+            textAlign: 'center',
+          }}
+        >
+          <Box
+            sx={{
+              mx: 'auto',
+              mb: 2.5,
+              display: 'grid',
+              placeItems: 'center',
+              width: 68,
+              height: 68,
+              borderRadius: '22px',
+              bgcolor: 'rgba(202,111,50,0.12)',
+              color: COLORS.warning,
+              border: '1px solid rgba(202,111,50,0.18)',
+            }}
+          >
+            <LockOutlinedIcon fontSize="large" />
+          </Box>
+
+          <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase', color: COLORS.muted }}>
+            Editor Workspace
+          </Typography>
+          <Typography className="font-editorial" sx={{ mt: 1, fontSize: { xs: '2.35rem', sm: '3rem' }, lineHeight: 0.95, color: COLORS.text }}>
+            User management is admin-only
+          </Typography>
+          <Typography sx={{ mx: 'auto', mt: 2, maxWidth: 520, fontSize: '0.96rem', lineHeight: 1.8, color: COLORS.muted }}>
+            Your editor account can manage article content, but account roles, status changes, and user records are reserved for admins.
+          </Typography>
+        </Paper>
+      </Box>
+    )
+  }
+
   return (
     <Box sx={{ bgcolor: COLORS.bg, minHeight: '80vh', width: '100%' }}>
       {/* Header Section */}
@@ -614,12 +641,6 @@ const UsersPage = () => {
           Add User
         </Button>
       </Box>
-
-      {seed.error ? (
-        <Alert severity="error" sx={{ mb: 2.5, borderRadius: '18px' }}>
-          {seed.error}
-        </Alert>
-      ) : null}
 
       <Box
         sx={{

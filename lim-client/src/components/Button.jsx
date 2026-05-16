@@ -7,7 +7,7 @@ const variantClasses = {
     'ui-shadow-button-light border-[#d6d3d1] bg-white !text-[#111111] hover:-translate-y-0.5 hover:border-[#cfc8bf] hover:bg-white hover:!text-[#111111]',
 }
 
-const Button = ({ children, to, type = 'button', variant = 'secondary', className = '' }) => {
+const Button = ({ children, to, type = 'button', variant = 'secondary', className = '', ...props }) => {
   const classes = [
     'inline-flex min-h-10 items-center justify-center rounded-2xl border px-4 py-2 text-sm font-semibold tracking-[0.01em] transition duration-300 ease-out',
     variantClasses[variant] ?? variantClasses.secondary,
@@ -18,7 +18,7 @@ const Button = ({ children, to, type = 'button', variant = 'secondary', classNam
 
   if (to && /^https?:\/\//.test(to)) {
     return (
-      <a className={classes} href={to} rel="noreferrer" target="_blank">
+      <a className={classes} href={to} rel="noreferrer" target="_blank" {...props}>
         {children}
       </a>
     )
@@ -26,14 +26,14 @@ const Button = ({ children, to, type = 'button', variant = 'secondary', classNam
 
   if (to) {
     return (
-      <Link className={classes} to={to}>
+      <Link className={classes} to={to} {...props}>
         {children}
       </Link>
     )
   }
 
   return (
-    <button className={classes} type={type}>
+    <button className={classes} type={type} {...props}>
       {children}
     </button>
   )

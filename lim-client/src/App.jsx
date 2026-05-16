@@ -10,6 +10,7 @@ import DashLayout from './layouts/DashLayout'
 import SignInpage from './pages/AuthPages/SignInPage'
 import SignUpPage from './pages/AuthPages/SignUpPage'
 import DashboardPage from './pages/DashboardPages/DashboardPage'
+import DashArticleListPage from './pages/DashboardPages/DashArticleListPage'
 import ReportsPage from './pages/DashboardPages/ReportsPage'
 import UsersPage from './pages/DashboardPages/UsersPage'
 
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
       {
         path: "reports",
         element: <ReportsPage />,
+      },
+      {
+        path: "articles",
+        element: <DashArticleListPage />,
       },
       {
         path: "users",

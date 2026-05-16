@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { alpha, styled, useTheme } from '@mui/material/styles'
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
+import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined'
@@ -24,13 +25,15 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
+import { getCurrentUser, setCurrentUser } from '../services/userStore'
 
 const drawerWidth = 232
 
 const dashboardNavItems = [
   { label: 'Overview', title: 'Overview', to: '/dashboard', icon: DashboardOutlinedIcon },
   { label: 'Reports', title: 'Reports', to: '/dashboard/reports', icon: AssessmentOutlinedIcon },
-  { label: 'Users', title: 'Users', to: '/dashboard/users', icon: PeopleOutlineOutlinedIcon },
+  { label: 'Articles', title: 'Articles', to: '/dashboard/articles', icon: ArticleOutlinedIcon },
+  { label: 'Users', title: 'Users', to: '/dashboard/users', icon: PeopleOutlineOutlinedIcon, adminOnly: true },
 ]
 
 const openedMixin = (theme) => ({
@@ -199,11 +202,17 @@ function DashLayout() {
   const [open, setOpen] = useState(true)
   const location = useLocation()
   const navigate = useNavigate()
+  const currentUser = getCurrentUser()
+  const visibleNavItems = dashboardNavItems.filter((item) => !item.adminOnly || currentUser?.role === 'admin')
   const pageTitle = getPageTitle(location.pathname)
 
   const handleDrawerOpen = () => setOpen(true)
   const handleDrawerClose = () => setOpen(false)
   const handleReturnHome = () => navigate('/')
+  const handleSignOut = () => {
+    setCurrentUser(null)
+    navigate('/auth/signin')
+  }
 
   return (
     <Box
@@ -273,6 +282,22 @@ function DashLayout() {
           >
             Home
           </Button>
+          <Button
+            variant="outlined"
+            onClick={handleSignOut}
+            sx={{
+              borderRadius: '999px',
+              borderColor: 'var(--border)',
+              color: 'var(--text)',
+              px: 2,
+              py: 0.9,
+              fontWeight: 600,
+              textTransform: 'none',
+              bgcolor: 'rgba(255,255,255,0.82)',
+            }}
+          >
+            Sign Out
+          </Button>
         </Toolbar>
       </AppBar>
 
@@ -289,7 +314,7 @@ function DashLayout() {
         <Divider sx={{ borderColor: 'rgba(17,17,17,0.08)' }} />
 
         <List sx={{ px: 1.25, pt: 1.25 }}>
-          {dashboardNavItems.map((item) => (
+          {visibleNavItems.map((item) => (
             <ListItem key={item.to} disablePadding sx={{ display: 'block', mb: 0.75 }}>
               <ListItemButton
                 component={Link}
