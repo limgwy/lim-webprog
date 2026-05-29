@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import {
@@ -25,7 +25,7 @@ import {
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import { DataGrid } from '@mui/x-data-grid'
-import { articleImageOptions, categories, getArticles, saveArticles } from '../../services/articleStore'
+import { articleImageOptions, categories, getArticles, getArticlesAsync, saveArticleAsync } from '../../services/articleStore'
 
 const COLORS = {
   primary: '#c58c7b',
@@ -102,13 +102,22 @@ const DashArticleListPage = () => {
   const [modal, setModal] = useState({ open: false, id: null })
   const [form, setForm] = useState(blankForm)
   const [errors, setErrors] = useState({})
+  const [requestError, setRequestError] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
 
-  const commitArticles = (updater) => {
-    setArticles((prev) => {
-      const nextArticles = typeof updater === 'function' ? updater(prev) : updater
-      return saveArticles(nextArticles)
+  useEffect(() => {
+    let isMounted = true
+
+    getArticlesAsync().then((nextArticles) => {
+      if (isMounted) {
+        setArticles(nextArticles)
+      }
     })
-  }
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const openModal = (article) => {
     setModal({ open: true, id: article?.id ?? null })
@@ -122,6 +131,7 @@ const DashArticleListPage = () => {
         : { ...blankForm }
     )
     setErrors({})
+    setRequestError('')
   }
 
   const closeModal = () => {
@@ -172,7 +182,7 @@ const DashArticleListPage = () => {
     return nextErrors
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     const nextErrors = validate()
 
@@ -196,25 +206,33 @@ const DashArticleListPage = () => {
       isPublished: form.isPublished,
     }
 
-    commitArticles((prev) =>
-      modal.id
-        ? prev.map((article) => (article.id === modal.id ? { ...article, ...nextArticle } : article))
-        : [
-            ...prev,
-            {
-              id: prev.reduce((max, article) => Math.max(max, Number(article.id) || 0), 0) + 1,
-              ...nextArticle,
-            },
-          ]
-    )
+    try {
+      setIsSaving(true)
+      const savedArticle = await saveArticleAsync(modal.id ? { ...nextArticle, id: modal.id } : nextArticle)
+      setArticles((prev) =>
+        modal.id
+          ? prev.map((article) => (article.id === modal.id ? savedArticle : article))
+          : [...prev.filter((article) => article.id !== savedArticle.id), savedArticle]
+      )
+    } catch (error) {
+      setRequestError(error.message || 'Unable to save article.')
+      setIsSaving(false)
+      return
+    }
 
+    setIsSaving(false)
     closeModal()
   }
 
-  const togglePublished = (id) => {
-    commitArticles((prev) =>
-      prev.map((article) => (article.id === id ? { ...article, isPublished: !article.isPublished } : article))
-    )
+  const togglePublished = async (id) => {
+    const article = articles.find((item) => item.id === id)
+
+    if (!article) {
+      return
+    }
+
+    const savedArticle = await saveArticleAsync({ ...article, isPublished: !article.isPublished })
+    setArticles((prev) => prev.map((item) => (item.id === id ? savedArticle : item)))
   }
 
   const fieldProps = (name, label, extra = {}) => ({
@@ -486,6 +504,11 @@ const DashArticleListPage = () => {
             {modal.id ? 'Edit Article' : 'Add Article'}
           </DialogTitle>
           <DialogContent dividers sx={{ px: { xs: 2, sm: 3 }, borderTop: 'none', borderBottom: 'none' }}>
+            {requestError ? (
+              <Alert severity="error" sx={{ mb: 2, borderRadius: '18px' }}>
+                {requestError}
+              </Alert>
+            ) : null}
             <Stack spacing={3} sx={{ pt: 2 }}>
               <TextField {...fieldProps('title', 'Title')} />
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
@@ -522,8 +545,8 @@ const DashArticleListPage = () => {
             <Button onClick={closeModal} sx={{ color: COLORS.muted, fontWeight: 700, textTransform: 'none' }}>
               Cancel
             </Button>
-            <Button type="submit" variant="contained" sx={{ bgcolor: COLORS.primary, borderRadius: '999px', px: 4, fontWeight: 800, textTransform: 'none', boxShadow: '0 10px 24px rgba(197,140,123,0.28)', '&:hover': { bgcolor: '#b47b6a' } }}>
-              {modal.id ? 'Update Article' : 'Save Article'}
+            <Button disabled={isSaving} type="submit" variant="contained" sx={{ bgcolor: COLORS.primary, borderRadius: '999px', px: 4, fontWeight: 800, textTransform: 'none', boxShadow: '0 10px 24px rgba(197,140,123,0.28)', '&:hover': { bgcolor: '#b47b6a' } }}>
+              {isSaving ? 'Saving...' : modal.id ? 'Update Article' : 'Save Article'}
             </Button>
           </DialogActions>
         </Box>

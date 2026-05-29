@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import Button from '../../components/Button';
 import appleIcon from '../../assets/appleid_button.png';
 import googleIcon from '../../assets/web_neutral_sq_na.svg';
-import { authenticateUser } from '../../services/userStore'
+import { authenticateUserAsync } from '../../services/userStore'
 
 const inputClasses =
   'mt-1.5 w-full rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-2.5 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-zinc-900 focus:bg-zinc-50';
@@ -18,16 +18,19 @@ const SignInPage = () => {
   const navigate = useNavigate()
   const [form, setForm] = useState({ emailOrUsername: '', password: '' })
   const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleChange = ({ target: { name, value } }) => {
     setForm((prev) => ({ ...prev, [name]: value }))
     setError('')
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
+    setIsSubmitting(true)
 
-    const result = authenticateUser(form)
+    const result = await authenticateUserAsync(form)
+    setIsSubmitting(false)
 
     if (result.error) {
       setError(result.error)
@@ -96,8 +99,8 @@ const SignInPage = () => {
           </button>
         </div>
 
-        <Button className={actionButtonClassName} type="submit" variant="primary">
-          Log In
+        <Button className={actionButtonClassName} disabled={isSubmitting} type="submit" variant="primary">
+          {isSubmitting ? 'Logging In...' : 'Log In'}
         </Button>
 
         <p className="pt-1 text-center text-sm text-zinc-600">

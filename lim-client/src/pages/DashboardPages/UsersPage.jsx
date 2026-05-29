@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
@@ -28,7 +28,7 @@ import { DataGrid } from '@mui/x-data-grid'
 import InputLabel from '@mui/material/InputLabel'
 import FormControl from '@mui/material/FormControl'
 import Select from '@mui/material/Select'
-import { genders, getCurrentUser, getUsers, roles, saveUsers } from '../../services/userStore'
+import { addUserAsync, genders, getCurrentUser, getUsers, getUsersAsync, roles, updateUserAsync } from '../../services/userStore'
 
 const COLORS = {
   primary: '#c58c7b',
@@ -148,13 +148,22 @@ const UsersPage = () => {
   const [form, setForm] = useState(blankForm)
   const [errors, setErrors] = useState({})
   const [showPassword, setShowPassword] = useState(false)
+  const [requestError, setRequestError] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
 
-  const commitUsers = (updater) => {
-    setUsers((prev) => {
-      const nextUsers = typeof updater === 'function' ? updater(prev) : updater
-      return saveUsers(nextUsers)
+  useEffect(() => {
+    let isMounted = true
+
+    getUsersAsync().then((nextUsers) => {
+      if (isMounted) {
+        setUsers(nextUsers)
+      }
     })
-  }
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const resetForm = () => {
     setForm({ ...blankForm })
@@ -165,6 +174,7 @@ const UsersPage = () => {
     setModal({ open: true, id: user?.id ?? null })
     setForm(user ? { ...blankForm, ...user } : { ...blankForm })
     setErrors({})
+    setRequestError('')
   }
 
   const closeModal = () => {
@@ -240,7 +250,7 @@ const UsersPage = () => {
     return nextErrors
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     const nextErrors = validate()
 
@@ -263,23 +273,33 @@ const UsersPage = () => {
       isActive: form.isActive,
     }
 
-    commitUsers((prev) =>
-      modal.id
-        ? prev.map((user) => (user.id === modal.id ? { ...user, ...nextUser } : user))
-        : [
-            ...prev,
-            {
-              id: prev.reduce((max, user) => Math.max(max, Number(user.id) || 0), 0) + 1,
-              ...nextUser,
-            },
-          ]
-    )
+    try {
+      setIsSaving(true)
+      const savedUser = modal.id ? await updateUserAsync(modal.id, nextUser) : await addUserAsync(nextUser)
+      setUsers((prev) =>
+        modal.id
+          ? prev.map((user) => (user.id === modal.id ? savedUser : user))
+          : [...prev.filter((user) => user.id !== savedUser.id), savedUser]
+      )
+    } catch (error) {
+      setRequestError(error.message || 'Unable to save user.')
+      setIsSaving(false)
+      return
+    }
 
+    setIsSaving(false)
     closeModal()
   }
 
-  const toggleStatus = (id) => {
-    commitUsers((prev) => prev.map((user) => (user.id === id ? { ...user, isActive: !user.isActive } : user)))
+  const toggleStatus = async (id) => {
+    const user = users.find((item) => item.id === id)
+
+    if (!user) {
+      return
+    }
+
+    const savedUser = await updateUserAsync(id, { ...user, isActive: !user.isActive })
+    setUsers((prev) => prev.map((item) => (item.id === id ? savedUser : item)))
   }
 
   const fieldProps = (name, label, extra = {}) => ({
@@ -770,6 +790,11 @@ const UsersPage = () => {
               borderBottom: 'none',
             }}
           >
+            {requestError ? (
+              <Alert severity="error" sx={{ mb: 2, borderRadius: '18px' }}>
+                {requestError}
+              </Alert>
+            ) : null}
             <Stack spacing={3} sx={{ pt: 2 }}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField {...fieldProps('firstName', 'First Name')} />
@@ -845,6 +870,7 @@ const UsersPage = () => {
               Cancel
             </Button>
             <Button
+              disabled={isSaving}
               type="submit"
               variant="contained"
               sx={{
@@ -857,7 +883,7 @@ const UsersPage = () => {
                 '&:hover': { bgcolor: '#b47b6a' },
               }}
             >
-              {modal.id ? 'Update User' : 'Save User'}
+              {isSaving ? 'Saving...' : modal.id ? 'Update User' : 'Save User'}
             </Button>
           </DialogActions>
         </Box>

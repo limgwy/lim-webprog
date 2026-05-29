@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import Button from '../../components/Button';
 import appleIcon from '../../assets/appleid_button.png';
 import googleIcon from '../../assets/web_neutral_sq_na.svg';
-import { addUser, getUsers, genders } from '../../services/userStore'
+import { addUserAsync, genders, getUsersAsync } from '../../services/userStore'
 
 const inputClasses =
   'mt-1.5 w-full rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-2.5 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-zinc-900 focus:bg-zinc-50';
@@ -30,66 +30,82 @@ const SignUpPage = () => {
   const navigate = useNavigate()
   const [form, setForm] = useState(initialForm)
   const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleChange = ({ target: { name, value } }) => {
     setForm((prev) => ({ ...prev, [name]: value }))
     setError('')
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
+    setIsSubmitting(true)
 
     const email = form.email.trim().toLowerCase()
     const username = form.username.trim().toLowerCase()
-    const users = getUsers()
+    const users = await getUsersAsync()
 
     if (Object.values(form).some((value) => !String(value).trim())) {
       setError('Please complete all fields.')
+      setIsSubmitting(false)
       return
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setError('Enter a valid email address.')
+      setIsSubmitting(false)
       return
     }
 
     if (!/^\d+$/.test(form.age.trim())) {
       setError('Age must be a number only.')
+      setIsSubmitting(false)
       return
     }
 
     if (!/^\d{11}$/.test(form.contactNumber.trim())) {
       setError('Contact number must be exactly 11 digits.')
+      setIsSubmitting(false)
       return
     }
 
     if (username.includes(' ')) {
       setError('Username must not contain spaces.')
+      setIsSubmitting(false)
       return
     }
 
     if (form.password.trim().length < 8) {
       setError('Password must be at least 8 characters.')
+      setIsSubmitting(false)
       return
     }
 
     if (users.some((user) => user.email === email)) {
       setError('Email address already exists.')
+      setIsSubmitting(false)
       return
     }
 
     if (users.some((user) => user.username === username)) {
       setError('Username already exists.')
+      setIsSubmitting(false)
       return
     }
 
-    addUser({
-      ...form,
-      email,
-      username,
-      role: 'editor',
-      isActive: true,
-    })
+    try {
+      await addUserAsync({
+        ...form,
+        email,
+        username,
+        role: 'editor',
+        isActive: true,
+      })
+    } catch (requestError) {
+      setError(requestError.message || 'Unable to create account.')
+      setIsSubmitting(false)
+      return
+    }
 
     navigate('/auth/signin')
   }
@@ -258,8 +274,8 @@ const SignUpPage = () => {
           />
         </div>
 
-        <Button className={actionButtonClassName} type="submit" variant="primary">
-          Create Account
+        <Button className={actionButtonClassName} disabled={isSubmitting} type="submit" variant="primary">
+          {isSubmitting ? 'Creating Account...' : 'Create Account'}
         </Button>
 
         <p className="pt-1 text-center text-sm text-zinc-600">

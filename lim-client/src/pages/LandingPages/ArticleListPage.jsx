@@ -1,9 +1,24 @@
+import { useEffect, useState } from 'react'
 import ArticleList from '../../components/ArticleList'
 import Button from '../../components/Button'
-import { getPublishedArticles } from '../../services/articleStore'
+import { getPublishedArticles, getPublishedArticlesAsync } from '../../services/articleStore'
 
 const ArticleListPage = () => {
-  const articles = getPublishedArticles()
+  const [articles, setArticles] = useState(() => getPublishedArticles())
+
+  useEffect(() => {
+    let isMounted = true
+
+    getPublishedArticlesAsync().then((nextArticles) => {
+      if (isMounted) {
+        setArticles(nextArticles)
+      }
+    })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   return (
     <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 sm:px-6">

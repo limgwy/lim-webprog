@@ -1,6 +1,24 @@
 import seedArticles from '../assets/article-content'
 
 const ARTICLES_KEY = 'cafe-atlas-articles'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
+
+const requestJson = async (path, options = {}) => {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers ?? {}),
+    },
+    ...options,
+  })
+  const data = await response.json().catch(() => ({}))
+
+  if (!response.ok) {
+    throw new Error(data.error || 'Request failed.')
+  }
+
+  return data
+}
 
 const seedImages = seedArticles.reduce((images, article) => {
   images[article.name] = article.image
@@ -81,6 +99,19 @@ export const getArticles = () => {
   return seededArticles
 }
 
+export const getArticlesAsync = async () => {
+  try {
+    const articles = await requestJson('/api/articles')
+    if (Array.isArray(articles) && articles.length) {
+      return saveArticles(articles)
+    }
+  } catch {
+    return getArticles()
+  }
+
+  return getArticles()
+}
+
 export const saveArticles = (articles) => {
   const normalizedArticles = articles.map(normalizeArticle)
 
@@ -92,3 +123,21 @@ export const saveArticles = (articles) => {
 }
 
 export const getPublishedArticles = () => getArticles().filter((article) => article.isPublished).map(hydrateArticle)
+
+export const saveArticleAsync = async (article) => {
+  const path = article.id ? `/api/articles/${article.id}` : '/api/articles'
+  const method = article.id ? 'PUT' : 'POST'
+  const nextArticle = await requestJson(path, {
+    method,
+    body: JSON.stringify(article),
+  })
+  const articles = getArticles()
+  const nextArticles = article.id
+    ? articles.map((item) => (item.id === article.id ? nextArticle : item))
+    : [...articles, nextArticle]
+
+  saveArticles(nextArticles)
+  return normalizeArticle(nextArticle)
+}
+
+export const getPublishedArticlesAsync = async () => (await getArticlesAsync()).filter((article) => article.isPublished).map(hydrateArticle)
