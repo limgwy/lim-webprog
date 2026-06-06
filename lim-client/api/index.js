@@ -1,5 +1,3 @@
-import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
 import { MongoClient } from 'mongodb'
 
 const client = new MongoClient(process.env.MONGODB_URI ?? '')
@@ -7,6 +5,64 @@ let databasePromise
 
 const roles = ['admin', 'editor', 'viewer']
 const genders = ['male', 'female', 'other']
+const seedUsers = [
+  {
+    id: 1,
+    firstName: 'Mikaela',
+    lastName: 'Torres',
+    age: '24',
+    gender: 'female',
+    contactNumber: '09171234567',
+    email: 'mikaela@cafeatlas.studio',
+    role: 'admin',
+    username: 'mikaelatorres',
+    password: 'atlasadmin1',
+    address: 'Makati City',
+    isActive: true,
+  },
+  {
+    id: 2,
+    firstName: 'Lucas',
+    lastName: 'Villanueva',
+    age: '27',
+    gender: 'male',
+    contactNumber: '09181234567',
+    email: 'lucas@cafeatlas.studio',
+    role: 'editor',
+    username: 'lucasvillanueva',
+    password: 'coffeewords8',
+    address: 'Bonifacio Global City',
+    isActive: true,
+  },
+  {
+    id: 3,
+    firstName: 'Nadine',
+    lastName: 'Cruz',
+    age: '23',
+    gender: 'female',
+    contactNumber: '09191234567',
+    email: 'nadine@cafeatlas.studio',
+    role: 'editor',
+    username: 'nadinecruz',
+    password: 'quietnotes9',
+    address: 'Intramuros, Manila',
+    isActive: true,
+  },
+  {
+    id: 7,
+    firstName: 'Arielle',
+    lastName: 'Lim',
+    age: '29',
+    gender: 'other',
+    contactNumber: '09231234567',
+    email: 'arielle@cafeatlas.studio',
+    role: 'admin',
+    username: 'ariellelim',
+    password: 'publishplan8',
+    address: 'Legazpi Village, Makati',
+    isActive: true,
+  },
+]
 
 const normalizeUser = (user, index = 0) => ({
   id: Number(user.id) || index + 1,
@@ -102,9 +158,7 @@ const ensureUsersSeeded = async (users) => {
     return
   }
 
-  const seedPath = join(process.cwd(), 'src', 'data', 'users.json')
-  const seed = JSON.parse(await readFile(seedPath, 'utf8')).map(normalizeUser)
-  await users.insertMany(seed)
+  await users.insertMany(seedUsers.map(normalizeUser))
 }
 
 const handleUsers = async (req, res, users) => {
